@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { MONGODB_URI } = require('./config');
+const { db } = require('./index');
 
 // 创建一个定期监控数据库连接池的函数
 function monitorConnectionPool() {
@@ -42,11 +42,11 @@ function monitorConnectionPool() {
 const connectDB = async () => {
   try {
     const startTime = Date.now();
-    const conn = await mongoose.connect(MONGODB_URI, {
+    const conn = await mongoose.connect(db.uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       // 连接池设置
-      poolSize: 10,
+      maxPoolSize: 10,
       // 连接超时设置
       connectTimeoutMS: 10000,
       // 套接字超时设置

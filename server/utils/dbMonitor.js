@@ -33,15 +33,29 @@ const updatePoolStats = () => {
   try {
     const client = mongoose.connection.getClient();
     if (client && client.topology) {
-      const serverInfo = client.topology.s;
-      
       // 更新当前统计
       poolStats.timestamp = new Date();
-      poolStats.poolSize = serverInfo.poolSize || 0;
-      poolStats.available = serverInfo.availableConnections || 0;
-      poolStats.pending = (serverInfo.pendingConnections || []).length;
-      poolStats.maxPoolSize = mongoose.connection.config?.maxPoolSize || 0;
-      poolStats.minPoolSize = mongoose.connection.config?.minPoolSize || 0;
+      
+      // 尝试使用新版API获取连接池信息
+      if (client.topology.s.pool) {
+        poolStats.poolSize = client.topology.s.pool.totalConnections || 0;
+        poolStats.available = client.topology.s.pool.availableConnections || 0;
+        poolStats.pending = client.topology.s.pool.pendingConnections || 0;
+      } else if (client.s && client.s.options) {
+        // 如果无法直接访问连接池，则获取配置的值
+        poolStats.poolSize = client.connections?.length || 0;
+        poolStats.available = 0; // 无法准确获取
+        poolStats.pending = 0; // 无法准确获取
+      }
+      
+      // 从连接配置中获取最大/最小连接池大小
+      if (client.s && client.s.options) {
+        poolStats.maxPoolSize = client.s.options.maxPoolSize || 0;
+        poolStats.minPoolSize = client.s.options.minPoolSize || 0;
+      } else {
+        poolStats.maxPoolSize = mongoose.connection.config?.maxPoolSize || 0;
+        poolStats.minPoolSize = mongoose.connection.config?.minPoolSize || 0;
+      }
       
       // 添加到历史记录
       poolStats.history.push({

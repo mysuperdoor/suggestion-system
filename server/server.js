@@ -99,7 +99,6 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/suggestion-
   useNewUrlParser: true,
   useUnifiedTopology: true,
   // 优化连接池设置
-  poolSize: 10, // 设置连接池大小
   maxPoolSize: 20, // 最大连接数
   minPoolSize: 5, // 最小连接数
   connectTimeoutMS: 10000, // 连接超时时间

@@ -83,7 +83,7 @@ const Login = () => {
             color: 'white',
             fontSize: '16px',
             fontWeight: 'bold'
-          }}>P</div>
+          }}>Y</div>
           生产调度部
         </div>
       </div>
